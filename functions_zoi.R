@@ -122,6 +122,22 @@ f_data_interp_contour_no3500 <- function(gpname, altname) {
   return(contours)
 }
 
+f_data_interp_contour_no5000 <- function(gpname, altname) {
+  sp_2000 <- create_df(groupname = gpname, flow = "-2000", alt = altname)
+  sp_3500 <- create_df(groupname = gpname, flow = "-3500", alt = altname)
+  sp_5500 <- create_df(groupname = gpname, flow = "<-5500", alt = altname)
+  r.2000 <- interp_nodes(sp_2000)
+  r.3500 <- interp_nodes(sp_3500)
+  r.5500 <- interp_nodes(sp_5500)
+  group_list <- c(r.2000, r.3500, r.5500)
+  contours <- create_contour(group_list, inflow_group = gpname) %>%
+    mutate(flow = case_when(id %in% c(1,2) ~ "-2000",
+                            id %in% c(3,4) ~ "-3500",
+                            id %in% c(5,6) ~ "<-5500"))%>%
+    mutate(Alt = altname)
+  return(contours)
+}
+
 f_data_interp_contour_no5500 <- function(gpname, altname) {
   sp_2000 <- create_df(groupname = gpname, flow = "-2000", alt = altname)
   sp_3500 <- create_df(groupname = gpname, flow = "-3500", alt = altname)
