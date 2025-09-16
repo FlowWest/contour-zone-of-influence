@@ -39,8 +39,10 @@ source(here("functions_zoi.R"))
 
 # Read/Join data ---------------------------------------------------------
 delta <- st_read(here("shapefiles/Bay_Delta_Poly_New.shp"))
+# ZOI files are created in a Jupyter Notebook script for proportional overlap:
+# https://github.com/FlowWest/lto-proportion-overlap-calculations
 zoi_file_NAA = list.files("data_raw/zoi/", pattern = "NAA_.*csv$", full.names = TRUE)
-zoi_file_Alt5 = list.files("data_raw/zoi/", pattern = "Alt5.*csv$", full.names = TRUE)
+zoi_file_Act5 = list.files("data_raw/zoi/", pattern = "Act5.*csv$", full.names = TRUE)
 
 
 zoi_data_NAA <- lapply(zoi_file_NAA, read_csv) %>%
@@ -49,68 +51,70 @@ zoi_data_NAA <- lapply(zoi_file_NAA, read_csv) %>%
   rename(OMR_Flow = id) %>%
   mutate(OMR_Flow = if_else(OMR_Flow == "-sTha", "<-5500", OMR_Flow))%>%
   mutate(Alt = "NAA")
-zoi_data_Alt5 <- lapply(zoi_file_Alt5, read_csv) %>%
+zoi_data_Act5 <- lapply(zoi_file_Act5, read_csv) %>%
   bind_rows(.id = "id") %>%
-  mutate(id = paste0("-", substr(zoi_file_Alt5[as.numeric(id)],28, 31))) %>%
+  mutate(id = paste0("-", substr(zoi_file_Act5[as.numeric(id)],28, 31))) %>%
   rename(OMR_Flow = id) %>%
   mutate(OMR_Flow = if_else(OMR_Flow == "-1300", "<-5500", OMR_Flow)) %>%
-  mutate(Alt = "Alt5")
+  mutate(Alt = "Act5")
 
-lolo <- runif(n=2120) |>
-  as_data_frame()
-lomed <- runif(n=2120) |>
-  as_data_frame()
-lohi <- runif(n=2120) |>
-  as_data_frame()
-medlo <- runif(n=2120) |>
-  as_data_frame()
-medmed <- runif(n=2120) |>
-  as_data_frame()
-medhi <- runif(n=2120) |>
-  as_data_frame()
-hilo <- runif(n=2120) |>
-  as_data_frame()
-himed <- runif(n=2120) |>
-  as_data_frame()
-hihi <- runif(n=2120) |>
-  as_data_frame()
-zoi_data_Alt5_random <- zoi_data_Alt5 |>
-  cbind(lolo) |>
-  mutate(lolo = value) |>
-  dplyr::select(-value) |>
-  cbind(lomed) |>
-  mutate(lomed = value) |>
-  dplyr::select(-value) |>
-  cbind(lohi) |>
-  mutate(lohi = value) |>
-  dplyr::select(-value) |>
-  cbind(medlo) |>
-  mutate(medlo = value) |>
-  dplyr::select(-value) |>
-  cbind(medmed) |>
-  mutate(medmed = value) |>
-  dplyr::select(-value) |>
-  cbind(medhi) |>
-  mutate(medhi = value) |>
-  dplyr::select(-value) |>
-  cbind(hilo) |>
-  mutate(hilo = value) |>
-  dplyr::select(-value) |>
-  cbind(himed) |>
-  mutate(himed = value) |>
-  dplyr::select(-value) |>
-  cbind(hihi) |>
-  mutate(hihi = value) |>
-  dplyr::select(-value)
+# TEMPORARY, creating a dummy dataset
+# lolo <- runif(n=2120) |>
+#   as_data_frame()
+# lomed <- runif(n=2120) |>
+#   as_data_frame()
+# lohi <- runif(n=2120) |>
+#   as_data_frame()
+# medlo <- runif(n=2120) |>
+#   as_data_frame()
+# medmed <- runif(n=2120) |>
+#   as_data_frame()
+# medhi <- runif(n=2120) |>
+#   as_data_frame()
+# hilo <- runif(n=2120) |>
+#   as_data_frame()
+# himed <- runif(n=2120) |>
+#   as_data_frame()
+# hihi <- runif(n=2120) |>
+#   as_data_frame()
+# zoi_data_Alt5_random <- zoi_data_Alt5 |>
+#   cbind(lolo) |>
+#   mutate(lolo = value) |>
+#   dplyr::select(-value) |>
+#   cbind(lomed) |>
+#   mutate(lomed = value) |>
+#   dplyr::select(-value) |>
+#   cbind(lohi) |>
+#   mutate(lohi = value) |>
+#   dplyr::select(-value) |>
+#   cbind(medlo) |>
+#   mutate(medlo = value) |>
+#   dplyr::select(-value) |>
+#   cbind(medmed) |>
+#   mutate(medmed = value) |>
+#   dplyr::select(-value) |>
+#   cbind(medhi) |>
+#   mutate(medhi = value) |>
+#   dplyr::select(-value) |>
+#   cbind(hilo) |>
+#   mutate(hilo = value) |>
+#   dplyr::select(-value) |>
+#   cbind(himed) |>
+#   mutate(himed = value) |>
+#   dplyr::select(-value) |>
+#   cbind(hihi) |>
+#   mutate(hihi = value) |>
+#   dplyr::select(-value)
+
 # combine each individual file
-zoi_data <- rbind(zoi_data_NAA, zoi_data_Alt5_random)
+zoi_data <- rbind(zoi_data_NAA, zoi_data_Act5)
 
 # read in nodes, channels data
 nodes <- st_read("shapefiles/nodes.shp") %>%
   dplyr::select(node)
 nodes_4326 <- st_transform(nodes, crs = 4326) %>%
   mutate(points = "DSM2 nodes")
-channels0 <- read_csv("data_raw/DSM2_Version822_Grid_20231102.csv") %>%
+channels0 <- read_csv("data_raw/DSM2_Version822_Grid_20231102.csv") %>% # associates the down/up nodes and channel length between
   janitor::clean_names()  %>%
   rename(channel_number = chan_no) %>%
   dplyr::select(-manning, -dispersion)
@@ -140,7 +144,7 @@ zoi_channel_long <- zoi_channel %>%
   pivot_longer(cols = c(lolo:hihi), names_to = "group", values_to = "overlap")
 
 # Write data for channel length script
-write_csv(zoi_channel_long, "data_export/prop_overlap_data_long_alt5.csv")
+write_csv(zoi_channel_long, "data_export/prop_overlap_data_long_act5.csv")
 
 # Look at raw data -----------------------------------
 summary_vals <- zoi_channel_long %>%
@@ -191,7 +195,7 @@ zoi_channel_long %>% filter(overlap>=0 & overlap <=0.75) %>%
 
 # Run contour functions -------------------------------------
 inflow_order = c("lolo", "lomed", "lohi", "medlo", "medmed", "medhi", "hilo", "himed", "hihi")
-alt_order = c("NAA","Alt5")
+alt_order = c("NAA","Act5")
 delta_sp <- as(delta_4326, "Spatial")
 
 # NAA
@@ -207,26 +211,26 @@ hihi_contour_NAA <- f_data_interp_contour(gpname = "hihi", altname = "NAA")
 
 # Alt5
 # TODO - troubleshoot medmed, hihi
-lolo_contour_Alt5 <- f_data_interp_contour(gpname = "lolo", altname = "Alt5") # works
-lomed_contour_Alt5 <- f_data_interp_contour_no5500(gpname = "lomed", altname = "Alt5") # works
-lohi_contour_Alt5 <- f_data_interp_contour_no5500(gpname = "lohi", altname = "Alt5") # works
-medlo_contour_Alt5 <- f_data_interp_contour_no5000(gpname = "medlo", altname = "Alt5") # works now, no contour lines - this may be happening because there is no variation in the data works with no20005000 and no50005500, created no5000 and worked. something wrong with the 5000 results here
-medmed_contour_Alt5 <- f_data_interp_contour_no50005500(gpname = "medmed", altname = "Alt5") # this one does not work at all - no contour lines - this may be happening because there is no variation in the data
-medhi_contour_Alt5 <- f_data_interp_contour(gpname = "medhi", altname = "Alt5") # works
-hilo_contour_Alt5 <- f_data_interp_contour_no20005000(gpname = "hilo", altname = "Alt5") # works now, no contour lines - this may be happening because there is no variation in the data
-himed_contour_Alt5 <- f_data_interp_contour_no50005500(gpname = "himed", altname = "Alt5") # works now, no contour lines - this may be happening because there is no variation in the data
-hihi_contour_Alt5 <- f_data_interp_contour_no50005500(gpname = "hihi", altname = "Alt5") # this one does not work at all - no contour lines - this may be happening because there is no variation in the data
+lolo_contour_Act5 <- f_data_interp_contour(gpname = "lolo", altname = "Act5") # works
+lomed_contour_Act5 <- f_data_interp_contour_no5500(gpname = "lomed", altname = "Act5") # works
+lohi_contour_Act5 <- f_data_interp_contour_no5500(gpname = "lohi", altname = "Act5") # works
+medlo_contour_Act5 <- f_data_interp_contour_no5000(gpname = "medlo", altname = "Act5") # works now, no contour lines - this may be happening because there is no variation in the data works with no20005000 and no50005500, created no5000 and worked. something wrong with the 5000 results here
+medmed_contour_Act5 <- f_data_interp_contour_no50005500(gpname = "medmed", altname = "Act5") # this one does not work at all - no contour lines - this may be happening because there is no variation in the data
+medhi_contour_Act5 <- f_data_interp_contour(gpname = "medhi", altname = "Alt5") # works
+hilo_contour_Act5 <- f_data_interp_contour_no20005000(gpname = "hilo", altname = "Act5") # works now, no contour lines - this may be happening because there is no variation in the data
+himed_contour_Act5 <- f_data_interp_contour_no50005500(gpname = "himed", altname = "Act5") # works now, no contour lines - this may be happening because there is no variation in the data
+hihi_contour_Act5 <- f_data_interp_contour_no50005500(gpname = "hihi", altname = "Act5") # this one does not work at all - no contour lines - this may be happening because there is no variation in the data
 
 # random data (these all worked fine so it seems like it is the weird 1:1 data)
-lolo_contour_Alt5 <- f_data_interp_contour(gpname = "lolo", altname = "Alt5")
-lomed_contour_Alt5 <- f_data_interp_contour(gpname = "lomed", altname = "Alt5")
-lohi_contour_Alt5 <- f_data_interp_contour(gpname = "lohi", altname = "Alt5")
-medlo_contour_Alt5 <- f_data_interp_contour(gpname = "medlo", altname = "Alt5")
-medmed_contour_Alt5 <- f_data_interp_contour(gpname = "medmed", altname = "Alt5")
-medhi_contour_Alt5 <- f_data_interp_contour(gpname = "medhi", altname = "Alt5")
-hilo_contour_Alt5 <- f_data_interp_contour(gpname = "hilo", altname = "Alt5")
-himed_contour_Alt5 <- f_data_interp_contour(gpname = "himed", altname = "Alt5")
-hihi_contour_Alt5 <- f_data_interp_contour(gpname = "hihi", altname = "Alt5")
+lolo_contour_Act5 <- f_data_interp_contour(gpname = "lolo", altname = "Act5")
+lomed_contour_Act5 <- f_data_interp_contour(gpname = "lomed", altname = "Act5")
+lohi_contour_Act5 <- f_data_interp_contour(gpname = "lohi", altname = "Act5")
+medlo_contour_Act5 <- f_data_interp_contour(gpname = "medlo", altname = "Act5")
+medmed_contour_Act5 <- f_data_interp_contour(gpname = "medmed", altname = "Act5")
+medhi_contour_Act5 <- f_data_interp_contour(gpname = "medhi", altname = "Act5")
+hilo_contour_Act5 <- f_data_interp_contour(gpname = "hilo", altname = "Act5")
+himed_contour_Act5 <- f_data_interp_contour(gpname = "himed", altname = "Act5")
+hihi_contour_Act5 <- f_data_interp_contour(gpname = "hihi", altname = "Act5")
 ## Combine contours --------------------------
 
 # 0.75 represents contour at which 75% overlap exists
@@ -236,25 +240,25 @@ contours_all_NAA <- rbind(lolo_contour_NAA, lomed_contour_NAA, lohi_contour_NAA,
                       hilo_contour_NAA, himed_contour_NAA, hihi_contour_NAA) %>%
   mutate(OMR_flow = factor(flow, levels = c("-2000", "-3500", "-5000", "<-5500")))
 
-contours_all_Alt5 <- rbind(lolo_contour_Alt5, lomed_contour_Alt5, lohi_contour_Alt5,
-                          medlo_contour_Alt5,
-                          medmed_contour_Alt5,
-                          medhi_contour_Alt5,
-                          hilo_contour_Alt5, himed_contour_Alt5,
-                          hihi_contour_Alt5
+contours_all_Act5 <- rbind(lolo_contour_Act5, lomed_contour_Act5, lohi_contour_Act5,
+                          medlo_contour_Act5,
+                          medmed_contour_Act5,
+                          medhi_contour_Act5,
+                          hilo_contour_Act5, himed_contour_Act5,
+                          hihi_contour_Act5
                           ) %>%
   mutate(OMR_flow = factor(flow, levels = c("-2000", "-3500", "-5000", "<-5500")))
 
 
-save(contours_all_NAA, contours_all_Alt5, file = "contours_alt5.Rdata")
+save(contours_all_NAA, contours_all_Act5, file = "contours_act5.Rdata")
 
 # Can start here if desired
 # load("contours_allalts.Rdata")
 
 # Make one contour file for all
-alt_order2 = c("NAA","Alt5")
+alt_order2 = c("NAA","Act5")
 
-contourGroup <- rbind(contours_all_NAA, contours_all_Alt5)%>%
+contourGroup <- rbind(contours_all_NAA, contours_all_Act5)%>%
   mutate(grouper = paste0(group, "_", flow, group2),
          label = paste0(group2, "_", flow)) %>%
   rename(Inflow = group2) %>%
@@ -263,5 +267,5 @@ contourGroup <- rbind(contours_all_NAA, contours_all_Alt5)%>%
 
 # Make contour plots -------------------------------------------
 plot_contours(alt = "NAA", cont = 0.75)
-plot_contours(alt = "Alt5", cont = 0.75)
+plot_contours(alt = "Act5", cont = 0.75)
 

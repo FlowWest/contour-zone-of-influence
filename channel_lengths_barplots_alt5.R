@@ -25,14 +25,14 @@ source("functions_zoi.R")
 # Ordering ----------------------------------
 inflow_order = c("lolo", "lomed", "lohi", "medlo", "medmed", "medhi", "hilo", "himed", "hihi")
 # alt_order = c("EXP1", "EXP3", "NAA","ALT1","Alt2woTUCPwoVA","Alt2woTUCPDeltaVA", "Alt2woTUCPAllVA", "Alt2wTUCPwoVA", "ALT3", "ALT4")
-alt_order = c("NAA","Alt5")
+alt_order = c("NAA","Act5")
 
 # Read data ---------------------------------------------------------
 
-zoi_channel_group <- read_csv("data_export/prop_overlap_data_long_alt5.csv") %>%
+zoi_channel_group <- read_csv("data_export/prop_overlap_data_long_act5.csv") %>%
   filter(overlap>=0)# from contour_maps_inflow_allalts.R
 
-n_flow_OMR_alt <- read_csv("data_export/samplesizes_flow_OMR_alt5.csv")# from calculate_frequency_bins_alts.R
+n_flow_OMR_alt <- read_csv("data_export/samplesizes_flow_OMR_act5.csv")# from calculate_frequency_bins_alts.R
 
 # Filter to contours of interest -------------------------------------
 # Based on BA
@@ -113,7 +113,7 @@ med_barplot_data <- left_join(filtered2_med, n_flow_OMR_Alt %>% dplyr::select(OM
           strip.text = element_text(size = 10),
           legend.position = "top") +
   scale_fill_manual(values = pal[c(3:10)]))
-ggsave(filename="figures/attachment_plots/med_influence_omr_barplots_eis_alt5.png", plot=med_barplot_eis, height = 5, width = 6.5, units = "in")
+ggsave(filename="figures/attachment_plots/med_influence_omr_barplots_eis_act5.png", plot=med_barplot_eis, height = 5, width = 6.5, units = "in")
 
 (med_barplot_inflow_eis <- med_barplot_data %>%
   ggplot() +
@@ -127,7 +127,7 @@ ggsave(filename="figures/attachment_plots/med_influence_omr_barplots_eis_alt5.pn
           strip.text = element_text(size = 10),
           legend.position = "top") +
   scale_fill_manual(values = pal[c(3:10)]))
-ggsave(filename="figures/attachment_plots/med_influence_inflow_barplots_eis_alt5.png", plot=med_barplot_inflow_eis, height =7, width = 6, units = "in")
+ggsave(filename="figures/attachment_plots/med_influence_inflow_barplots_eis_act5.png", plot=med_barplot_inflow_eis, height =7, width = 6, units = "in")
 
 # (med_barplot_alt_eis <- med_barplot_data %>%
 #     ggplot() +
@@ -150,15 +150,15 @@ med_table <- filtered2_med %>%
   pivot_wider(names_from = "Alt", values_from = "sumLength", values_fill = list(n = 0)) %>%
   arrange(group) %>%
   mutate(group = factor(group, levels = inflow_order))%>%
-  dplyr::select(group, OMR_Flow, NAA, Alt5)
+  dplyr::select(group, OMR_Flow, NAA, Act5)
 
 med_table_long <- med_table %>%
-  pivot_longer(cols = NAA:Alt5, values_to = "sumLength", names_to = "Alt")
+  pivot_longer(cols = NAA:Act5, values_to = "sumLength", names_to = "Alt")
 
 med_prop <- med_table %>%
   dplyr::select(group, OMR_Flow, NAA, everything()) %>%
-  mutate(across(NAA:Alt5, ~ round((.x-NAA)/NAA * 100))) %>%
-  pivot_longer(cols = NAA:Alt5, values_to = "changeLength", names_to = "Alt")
+  mutate(across(NAA:Act5, ~ round((.x-NAA)/NAA * 100))) %>%
+  pivot_longer(cols = NAA:Act5, values_to = "changeLength", names_to = "Alt")
 
 
 #** EIS --------------------------------
@@ -172,9 +172,9 @@ med_table_EIS <- left_join(med_table_long, med_prop) %>%
   arrange(group) %>%
   mutate(group = factor(group, levels = inflow_order))%>%
   dplyr::select(`Inflow group` = group, `OMR bin` = OMR_Flow,
-                NAA, Alt5, everything())
+                NAA, Act5, everything())
 
-write_csv(med_table_EIS, "data_export/tab9_medium_hydro_channel_length_EISalt5.csv")
+write_csv(med_table_EIS, "data_export/tab9_medium_hydro_channel_length_EISact5.csv")
 
 # Calculate lows and highs for narrative -------------------------
 # ordered_medium <- med_table_long %>% arrange(sumLength) %>%

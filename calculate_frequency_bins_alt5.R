@@ -21,27 +21,20 @@ library(purrr)
 ## Read data -------------------------------
 
 # order
-# alt_order = c("EXP1", "EXP3", "NAA","ALT1",
-#               "ALT2d", "ALT2b", "ALT2c", "ALT2a", "ALT3", "ALT4")
-# alt_order2 =c("NAA","Alt1","Alt2woTUCPwoVA","Alt2woTUCPDeltaVA", "Alt2woTUCPAllVA", "Alt2wTUCPwoVA","Alt3", "Alt4")
-alt_order3 =c("NAA", "Alt5")
-# col_order = c("Flow", "OMR", "OMR_range",  "EXP1", "EXP3", "NAA",
-#               "ALT1",
-#               "ALT2d", "ALT2b", "ALT2c", "ALT2a",
-#               "ALT3", "ALT4")
+alt_order3 =c("NAA", "Act5")
 inflow_order = c("lolo", "lomed", "lohi", "medlo", "medmed", "medhi", "hilo", "himed", "hihi", "NA")
 omr_order = c("-2000","-3500","-5000", "<-5500",  "NA")
 
-
-
 # Read in data (DSM2 processing)
-
+# ALT 5 file provided by: Puneet.Khatavkar@stantec.com
+# NAA copied over from existing analysis
 fp <- dir(here::here("data_raw/DSM2_samples/sep2025"), full.names = TRUE)
 dsm2bins <- map(fp, read_csv, col_types = cols(.default = "c"))
 walk(dsm2bins, glimpse)
 
+# Sac and SJR flows by month, inflow group, OMR bin, scenario
 bins <- bind_rows(dsm2bins, .id = "id") %>%
-  mutate(Alt = case_when(id == 1 ~ "Alt5",
+  mutate(Alt = case_when(id == 1 ~ "Act5",
                          id ==2 ~ "NAA")) %>%
   mutate(Sub.group = replace(Sub.group, is.na(Sub.group), "NA")) %>%
   rename(Date = month_year) %>%
@@ -54,7 +47,6 @@ bins <- bind_rows(dsm2bins, .id = "id") %>%
          Alt = factor(Alt, levels = alt_order3),
          Sub.group = factor(Sub.group, levels = inflow_order))
 
-
 ## calculate sample sizes --------------------------
 # this is used later for channel length code
 
@@ -62,25 +54,25 @@ bins <- bind_rows(dsm2bins, .id = "id") %>%
 n_flow_OMR_Alt <- bins %>%
   group_by(Alt, Sub.group, OMR) %>%
   summarize(n = n(),
-            percent = round(n/700*100))%>%
+            percent = round(n/700*100)) %>% # 700 is the number of samples per Alt
   ungroup() %>%
   complete(Sub.group, OMR, nesting(Alt),
-           fill = list(n = 0))  %>%
+           fill = list(n = 0))  %>% # fill in any missing OMR/inflow with n = 0
   ungroup()
-
 
 # inflow bins only
 n_flow_Alt <- bins %>%
   group_by(Alt, Sub.group) %>%
   summarize(n = n(),
-            percent = round(n/700*100))%>%
+            percent = round(n/700*100)) %>%  #700 is the number of samples per Alt
   ungroup() %>%
   complete(Sub.group, nesting(Alt),
-           fill = list(n = 0))
+           fill = list(n = 0)) # fill in any missing OMR/inflow with n = 0
 
 ### write out ------------------------
-write_csv(n_flow_OMR_Alt, "data_export/samplesizes_flow_OMR_alt5.csv")
-write_csv(n_flow_Alt, "data_export/samplesizes_flow_alt5.csv")
+# used in channel_lengths_barplots_alt5.R to add sample sizes to barplots
+write_csv(n_flow_OMR_Alt, "data_export/samplesizes_flow_OMR_act5.csv")
+write_csv(n_flow_Alt, "data_export/samplesizes_flow_act5.csv")
 
 ### plot sample size data --------------------------------
 # pal <- c('#9a3324', "#88CCEE","#AA4499",'#003E51','#007396', '#C69214', '#DDCBA4','#FF671F', '#215732','#4C12A1')
@@ -103,7 +95,7 @@ write_csv(n_flow_Alt, "data_export/samplesizes_flow_alt5.csv")
         legend.position = "top",
         axis.title.x = element_blank(),
         strip.text = element_text(size= 10)))
-ggsave("figures/plot_dsm2_samples_omr_inflow_blue_alt5.png",
+ggsave("figures/plot_dsm2_samples_omr_inflow_blue_act5.png",
        plot = dsm_sample_plot_flow_omr, units = "in", width = 8, height = 9)
 
 # (dsm_sample_barplot_flow <- ggplot(data = n_flow_OMR_Alt, aes(x = Alt, y = n, fill = OMR), position = dodge2) +
