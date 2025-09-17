@@ -1,5 +1,5 @@
 ---
-title: "Appendix 1 Figures/Tables"
+title: "Appendix I Figures/Tables"
 format: 
   html:
     embed-resources: true
@@ -12,6 +12,19 @@ since the last version of Appendix I (from Adam Witt) so the results for that sc
 will be the same. 
 
 This document compiles the figures/tables using code originally developed by [Catarina Pien](https://github.com/BDO-Science/contour-zone-of-influence).
+
+Input files are generated using external scripts:
+
+1) Proportion overlap analysis (TODO insert link): generates `data_raw/zoi` files required for contour mapping and the channel length plots.
+- Requires h5 file of the alternative of interest and the h5 files without pumping for the same alternative
+
+2) KDE (TODO insert link): generates KDE plots required for Appendix I.
+- Requires DSS files
+
+Recommendations for improved documentation:
+- Create a generate Appendix I plots and tables script that sources the neccessary scripts in the appropriate order.
+- Include better documentation about how to generate input files.
+- Clean up the scripts to only include Appendix I output
 
 ```{r, include = F}
 library(tidyverse)
@@ -32,12 +45,13 @@ Table I.3-1. December – June ZOI flow groups based on Calsim 3 Sacramento (Fre
 ## Table I.3-2
 
 *Status: Complete*
+
 *source: calculate_frequency_bins_alt5.R*
 
 Table I.3-2b. Sample sizes (months) of Action 5 and the no action alternative (NAA) in each inflow group based on Calsim 3 and DSM2 results. Values have not been filtered for OMR group. 
 
 ```{r, echo = F, message = F, warning = F}
-table <- read_csv("data_export/tab2_samplesizes_inflowgroups_alts_dsm2_act5.csv")
+table <- read_csv("data_export/tab2_samplesizes_inflowgroups_alts_dsm2_alt5.csv")
 knitr::kable(table)
 ```
 
@@ -50,18 +64,20 @@ Table I.3-3. Summary Statistics for Inflow Groups and OMR Bins used in Analyses.
 ## Table 1.3-4
 
 *Status: Complete*
+
 *source: calculate_frequency_bins_alt5.R*
 
 Table I.3-4b. Sample sizes (months) of Action 5 and the no action alternative (NAA) in each inflow group and OMR bin based on Calsim 3 and DSM2 results. 
 
 ```{r, echo = F, message = F, warning = F}
-table <- read_csv("data_export/tab4_samplesizes_inflowgroups_omr_alts_dsm2_act5.csv")
+table <- read_csv("data_export/tab4_samplesizes_inflowgroups_omr_alts_dsm2_alt5.csv")
 knitr::kable(table)
 ```
 
 ## Figure 1.3-2
 
 *Status: Complete*
+
 *source: calculate_frequency_bins_alt5.R*
 
 ![Figure1.3-2b](figures/plot_dsm2_samples_omr_inflow_blue_act5.png)
@@ -94,6 +110,8 @@ These figures will not change
 
 *Status: Code review in progress, Final results blocked*
 
+*source: KDE python scripts, insert github when available*
+
 These are the KDE v velocity (fps) distribution plots. We will need 12 new plots
 for Act5. These are generated in Python scripts that Emanuel is working through.
 Waiting on the h5 file for Act5 without pumping.
@@ -115,41 +133,157 @@ Waiting on the h5 file for Act5 without pumping.
 
 *Status: Missing*
 
-Need to find where this is generated. 
+Need to find where this is generated. I think this must be generated with the KDE plots. Proportion overlap output used in these scripts is by inflow group (the table is only by OMR bin) and channel so there are multiple rows per node whereas the table is by node and OMR.
 
 Table I.3-7b. Proportional overlap values for Turner Cut, SJR at Jersey Point, and Old R at Middle River at different OMR bins across alternatives. 
 
 ## Figure I.3-104:111
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
 
-These figures will not change. We will need to add a new one for Act5
+*source: contour_maps_inflow_alt5.R*
+
+These figures will not change though we will need to add a new one for Act5
 
 These are generated in contour_maps_inflow_Act5.R. We are able to produce these
 with a random dummy dataset. We are waiting on the h5 file for Act5_NP to run
 the proportional overlap scripts.
 
-The data used to generate these are fake - randomly generated.
-
-![contour_map](figures/attachment_plots/contour_plot_alt5_0.75.png)
+![contour_map](figures/attachment_plots/contour_plot_Act5_0.75.png)
 
 Figure I.3-112. Faceted Contour Maps Delineating Delta Export Zone of Influence Under Varying Inflows and OMR Flows. The contours identify where there is up to 75% overlap in velocity distribution with and without CVP exports. Results apply to Act5. See Figure I.3-3 for group designations. 
 
-## Figure I.3-112:120
+## Figure I.3-112
 
-These only show NAA and the 3 types of Alt2. Assuming these will not change.
+These figures are the same as Figures I.3-123-133 but it was requested that they are included in both the BA and EIS section.
+
+*Status: Complete*
+
+*source: channel_lengths_barplots_al5.R*
+
+![Figure1.3-112b](figures/attachment_plots/stacked_barplot_lolo.png)
+
+Figure I.3-112b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to the lolo inflow group for Act5 and NAA.
+
+## Figure I.3-113
+
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-113b](figures/attachment_plots/stacked_barplot_lomed.png)
+
+Figure I.3-113b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to lomed inflow group for Act5 and NAA. 
+
+## Figure I.3-114
+
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-114b](figures/attachment_plots/stacked_barplot_lohi.png)
+
+Figure I.3-114b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to lohi inflow group for Act5 and NAA. 
+
+## Figure I.3-115
+
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-115b](figures/attachment_plots/stacked_barplot_medlo.png)
+
+Figure I.3-115b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to medlo inflow group for Act5 and NAA. 
+
+## Figure I.3-116
+
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-116b](figures/attachment_plots/stacked_barplot_medmed.png)
+
+Figure I.3-116b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to medmed inflow group for Act5 and NAA. 
+
+## Figure I.3-117
+
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-117b](figures/attachment_plots/stacked_barplot_medhi.png)
+
+Figure I.3-117b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to medhi inflow group for Act5 and NAA. 
+
+## Figure I.3-118
+
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-118b](figures/attachment_plots/stacked_barplot_hilo.png)
+
+Figure I.3-118b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to hilo inflow group for Act5 and NAA. 
+
+## Figure I.3-119
+
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-119b](figures/attachment_plots/stacked_barplot_himed.png)
+
+Figure I.3-119b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to himed inflow group for Act5 and NAA. 
+
+## Figure I.3-120
+
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-120b](figures/attachment_plots/stacked_barplot_hihi.png)
+
+Figure I.3-120b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to hihi inflow group for Act5 and NAA. 
 
 ## Table I.3-8
 
-These only show NAA and the 3 types of Alt2. Assuming these will not change.
+*Status: Complete*
 
-## Figure I.3-121:122
+*source: channel_lengths_barplots_alt5.R*
 
-These only show NAA and the 3 types of Alt2. Assuming these will not change.
+Table I.3-8b. Channel length (feet) altered by pumping for No Action Alternative (NAA) and Alternative 5 (Act5) across inflow groups and OMR bins. Values represent total summed channel length between nodes experiencing 0.25-0.75 proportional overlap, or medium hydrologic influence. Absolute values are rounded. 
+
+```{r, echo = F, message = F, warning = F}
+# created in channel_lengths_barplots_Act5.R
+table <- read_csv("data_export/tab8_medium_hydro_channel_length_BA_act5.csv")
+knitr::kable(table)
+```
+
+## Figure I.3-121
+
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-121b](figures/attachment_plots/med_influence_omr_barplots_eis_Act5.png)
+
+Figure I.3-121b. Proportion of total channel length in the Delta (DSM2 grid) that experiences medium (25-75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR flows of -2000, -3500, -5000, and less than -5500 cfs. Results are displayed for Action 5 and the NAA. Stars indicate combinations with five or less samples (months). 
+
+## Figure I.3-122
+
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-122b](figures/attachment_plots/med_influence_inflow_barplots_eis_Act5.png)
+
+Figure I.3-122b. Proportion of total channel length in the Delta (DSM2 grid) that experiences medium (25-75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR flows of -2000, -3500, -5000, and less than -5500 cfs. Results are displayed across Act5 and NAA. Stars indicate combinations with five or less samples (months). 
 
 ## Figure I.3-123
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
 
 ![Figure1.3-123b](figures/attachment_plots/stacked_barplot_lolo.png)
 
@@ -157,83 +291,103 @@ Figure I.3-123b. Proportion of total channel length in the Delta (DSM2 grid) tha
 
 ## Figure I.3-124
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
 
-![Figure1.3-123b](figures/attachment_plots/stacked_barplot_lomed.png)
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-124b](figures/attachment_plots/stacked_barplot_lomed.png)
 
 Figure I.3-124b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to lomed inflow group for Act5 and NAA. 
 
 ## Figure I.3-125
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
 
-![Figure1.3-123b](figures/attachment_plots/stacked_barplot_lohi.png)
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-125b](figures/attachment_plots/stacked_barplot_lohi.png)
 
 Figure I.3-125b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to lohi inflow group for Act5 and NAA. 
 
 ## Figure I.3-126
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
 
-![Figure1.3-123b](figures/attachment_plots/stacked_barplot_medlo.png)
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-126b](figures/attachment_plots/stacked_barplot_medlo.png)
 
 Figure I.3-126b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to medlo inflow group for Act5 and NAA. 
 
 ## Figure I.3-127
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
 
-![Figure1.3-123b](figures/attachment_plots/stacked_barplot_medmed.png)
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-127b](figures/attachment_plots/stacked_barplot_medmed.png)
 
 Figure I.3-127b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to medmed inflow group for Act5 and NAA. 
 
 ## Figure I.3-128
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
 
-![Figure1.3-123b](figures/attachment_plots/stacked_barplot_medhi.png)
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-128b](figures/attachment_plots/stacked_barplot_medhi.png)
 
 Figure I.3-128b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to medhi inflow group for Act5 and NAA. 
 
 ## Figure I.3-129
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
 
-![Figure1.3-123b](figures/attachment_plots/stacked_barplot_hilo.png)
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-129b](figures/attachment_plots/stacked_barplot_hilo.png)
 
 Figure I.3-129b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to hilo inflow group for Act5 and NAA. 
 
 ## Figure I.3-130
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
 
-![Figure1.3-123b](figures/attachment_plots/stacked_barplot_himed.png)
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-130b](figures/attachment_plots/stacked_barplot_himed.png)
 
 Figure I.3-130b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to himed inflow group for Act5 and NAA. 
 
 ## Figure I.3-131
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
 
-![Figure1.3-123b](figures/attachment_plots/stacked_barplot_hihi.png)
+*source: channel_lengths_barplots_alt5.R*
+
+![Figure1.3-131b](figures/attachment_plots/stacked_barplot_hihi.png)
 
 Figure I.3-131b. Proportion of total channel length in the Delta (DSM2 grid) that experiences high (<25% proportional overlap), medium (25-75% proportional overlap) and low (>75% proportional overlap) hydrologic influence at standardized inflow groups and across OMR bins of -2000, -3500, -5000, and less than -5500 cfs. Results apply to hihi inflow group for Act5 and NAA. 
 
 ## Table I.3-9
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
 
 Table I.3-9b. Channel length (feet) altered by pumping for No Action Alternative (NAA) and Alternative 5 (Act5) across inflow groups and OMR bins. Values represent total summed channel length between nodes experiencing 0.25-0.75 proportional overlap, or medium hydrologic influence. Values in parentheses represent percent difference between each alternative and NAA. Absolute values are rounded. 
 
 ```{r, echo = F, message = F, warning = F}
 # created in channel_lengths_barplots_Act5.R
-table <- read_csv("data_export/tab9_medium_hydro_channel_length_EISAct5.csv")
+table <- read_csv("data_export/tab9_medium_hydro_channel_length_EIS_act5.csv")
 knitr::kable(table)
 ```
 
 ## Figure I.3-132
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
 
 ![Figure1.3-132b](figures/attachment_plots/med_influence_omr_barplots_eis_Act5.png)
 
@@ -241,7 +395,9 @@ Figure I.3-132b. Proportion of total channel length in the Delta (DSM2 grid) tha
 
 ## Figure I.3-133
 
-*Status: Fake results, Final results blocked*
+*Status: Complete*
+
+*source: channel_lengths_barplots_alt5.R*
 
 ![Figure1.3-133b](figures/attachment_plots/med_influence_inflow_barplots_eis_Act5.png)
 

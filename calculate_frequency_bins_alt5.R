@@ -374,16 +374,16 @@ bins_months_prop_table <- bins_months_table %>%
 
 # calculate proportion NA
 not_included <- bins_summary_complete %>%
-  # filter(OMR %in% c("Other", "positive")) %>%
+  filter(OMR %in% c("Other", "positive")) %>%
   filter((Flow == "NA" | OMR == "Other") | (Flow == "NA" & OMR == "Other")) %>%
   group_by(Alt, OMR) %>%
   summarize(num =sum(n),
             prop = round(num/700,2))
 
-# not_included_wide <- not_included %>%
-#   select(-num) %>%
-#   pivot_wider(names_from = "Alt", values_from = "prop")
-# write_csv(not_included_wide, "data_export/data_not_included_allalts.csv")
+not_included_wide <- not_included %>%
+  select(-num) %>%
+  pivot_wider(names_from = "Alt", values_from = "prop")
+write_csv(not_included_wide, "data_export/data_not_included_allalts.csv")
 
 ## plot results --------------------------
 bins_plotting <- bins_summary_complete %>%

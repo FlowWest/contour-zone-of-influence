@@ -160,11 +160,10 @@ med_prop <- med_table %>%
   mutate(across(NAA:Act5, ~ round((.x-NAA)/NAA * 100))) %>%
   pivot_longer(cols = NAA:Act5, values_to = "changeLength", names_to = "Alt")
 
-
 #** EIS --------------------------------
 med_table_EIS <- left_join(med_table_long, med_prop) %>%
   # mutate_if(is.numeric, ~as.character(.),
-            # is.character, ~replace_na(.,""))
+  # is.character, ~replace_na(.,""))
   mutate(length_change = paste0(sumLength, " (", changeLength, "%)" )) %>%
   mutate(length_change = replace(length_change, length_change == "NA (NA%)", "NA")) %>%
   dplyr::select(-sumLength, -changeLength) %>%
@@ -174,7 +173,43 @@ med_table_EIS <- left_join(med_table_long, med_prop) %>%
   dplyr::select(`Inflow group` = group, `OMR bin` = OMR_Flow,
                 NAA, Act5, everything())
 
-write_csv(med_table_EIS, "data_export/tab9_medium_hydro_channel_length_EISact5.csv")
+write_csv(med_table_EIS, "data_export/tab9_medium_hydro_channel_length_EIS_act5.csv")
+
+#** BA figures -----------------------------
+med_barplot_data_ba <- med_barplot_data
+
+(med_barplot_ba <- med_barplot_data_ba %>%
+    ggplot() +
+    geom_col(aes(OMR_Flow, pLength, fill = Alt), position= position_dodge(0.75, preserve = "single"), width = 0.6) +
+    geom_text(aes(OMR_Flow, pLength, group = Alt, label = low_n), vjust = -0.01, position= position_dodge(0.75))+
+    facet_wrap(~group) +
+    labs(y = "Proportional Channel Length", x = "OMR Bin", fill = "PA Components") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90),
+          legend.position = "top") +
+    guides(fill = guide_legend(nrow = 2)) +
+    scale_fill_manual(values = pal[c(3,5,6,7)]))
+ggsave(filename="figures/attachment_plots/med_influence_omr_barplots_ba_act5.png", plot=med_barplot_ba, height = 5, width = 6.5, units = "in")
+
+(med_barplot_inflow_ba <- med_barplot_data_ba %>%
+    ggplot() +
+    geom_col(aes(group, pLength, fill = Alt), position= position_dodge(0.75, preserve = "single"), width = 0.6) +
+    geom_text(aes(group, pLength, group = Alt, label = low_n), vjust = -0.1, position= position_dodge(0.75))+
+    facet_wrap(~OMR_Flow, nrow = 4) +
+    labs(y = "Proportional Channel Length", x = "Inflow Group", fill = "PA Components") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90),
+          legend.position = "top") +
+    guides(fill = guide_legend(nrow = 2)) +
+    scale_fill_manual(values = pal[c(3,5,6,7)]))
+ggsave(filename="figures/attachment_plots/med_influence_inflow_barplots_ba_act5.png", plot=med_barplot_inflow_ba, height =8, width = 6, units = "in")
+
+#** BA ---------------------
+med_table_BA <- med_table %>%
+  dplyr::select(`Inflow group` = group, `OMR bin` = OMR_Flow, NAA, Act5)
+
+write_csv(med_table_BA, "data_export/tab8_medium_hydro_channel_length_BA_act5.csv")
+
 
 # Calculate lows and highs for narrative -------------------------
 # ordered_medium <- med_table_long %>% arrange(sumLength) %>%

@@ -17,7 +17,7 @@ library(tidyr)
 flow.dat0 <- read_excel("data_raw/calsim/Reclamation_2021LTO_CalSim3_SacFreeport_SanJoaquinVernalis_rev01_20230913__NAA_090723.xlsx", skip = 6)
 colnames(flow.dat0) = c("Row", "Date", "Sac.cfs", "SJR.cfs")
 flow.dat1 <- flow.dat0 %>%
-  select(-Row) %>%
+  dplyr::select(-Row) %>%
   mutate(Month = month(Date),
          Year = year(Date))
 # read omr data
@@ -32,8 +32,8 @@ wytype <- read.csv("data_raw/WYType.csv") %>% mutate(WY = as.numeric(WY)) %>% fi
 flow.dat <- left_join(flow.dat1, omr.dat) %>%
   left_join(export.dat) %>%
   mutate(WY = if_else(Month>9, Year+1, Year)) %>%
-  left_join(wytype %>% select(WY, Yr.type)) %>%
-  select(-Row) %>%
+  left_join(wytype %>% dplyr::select(WY, Yr.type)) %>%
+  dplyr::select(-Row) %>%
   mutate(OMR_group = case_when(OMR >= -2500 & OMR <=-1500 ~ "-2000",
                                OMR >= -4000 & OMR <=-3000 ~ "-3500",
                                OMR >= -5500 & OMR <=-4500 ~ "-5000",

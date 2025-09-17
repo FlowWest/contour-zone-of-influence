@@ -26,7 +26,7 @@ library(sp)
 library(gstat)
 library(raster)
 library(tmap)
-library(rgdal)
+#library(rgdal)
 
 # Visualization
 library(ggmap)
@@ -57,54 +57,6 @@ zoi_data_Act5 <- lapply(zoi_file_Act5, read_csv) %>%
   rename(OMR_Flow = id) %>%
   mutate(OMR_Flow = if_else(OMR_Flow == "-1300", "<-5500", OMR_Flow)) %>%
   mutate(Alt = "Act5")
-
-# TEMPORARY, creating a dummy dataset
-# lolo <- runif(n=2120) |>
-#   as_data_frame()
-# lomed <- runif(n=2120) |>
-#   as_data_frame()
-# lohi <- runif(n=2120) |>
-#   as_data_frame()
-# medlo <- runif(n=2120) |>
-#   as_data_frame()
-# medmed <- runif(n=2120) |>
-#   as_data_frame()
-# medhi <- runif(n=2120) |>
-#   as_data_frame()
-# hilo <- runif(n=2120) |>
-#   as_data_frame()
-# himed <- runif(n=2120) |>
-#   as_data_frame()
-# hihi <- runif(n=2120) |>
-#   as_data_frame()
-# zoi_data_Alt5_random <- zoi_data_Alt5 |>
-#   cbind(lolo) |>
-#   mutate(lolo = value) |>
-#   dplyr::select(-value) |>
-#   cbind(lomed) |>
-#   mutate(lomed = value) |>
-#   dplyr::select(-value) |>
-#   cbind(lohi) |>
-#   mutate(lohi = value) |>
-#   dplyr::select(-value) |>
-#   cbind(medlo) |>
-#   mutate(medlo = value) |>
-#   dplyr::select(-value) |>
-#   cbind(medmed) |>
-#   mutate(medmed = value) |>
-#   dplyr::select(-value) |>
-#   cbind(medhi) |>
-#   mutate(medhi = value) |>
-#   dplyr::select(-value) |>
-#   cbind(hilo) |>
-#   mutate(hilo = value) |>
-#   dplyr::select(-value) |>
-#   cbind(himed) |>
-#   mutate(himed = value) |>
-#   dplyr::select(-value) |>
-#   cbind(hihi) |>
-#   mutate(hihi = value) |>
-#   dplyr::select(-value)
 
 # combine each individual file
 zoi_data <- rbind(zoi_data_NAA, zoi_data_Act5)
@@ -209,28 +161,18 @@ hilo_contour_NAA <- f_data_interp_contour_no2000(gpname = "hilo", altname = "NAA
 himed_contour_NAA <- f_data_interp_contour(gpname = "himed", altname = "NAA")
 hihi_contour_NAA <- f_data_interp_contour(gpname = "hihi", altname = "NAA")
 
-# Alt5
-# TODO - troubleshoot medmed, hihi
-lolo_contour_Act5 <- f_data_interp_contour(gpname = "lolo", altname = "Act5") # works
-lomed_contour_Act5 <- f_data_interp_contour_no5500(gpname = "lomed", altname = "Act5") # works
-lohi_contour_Act5 <- f_data_interp_contour_no5500(gpname = "lohi", altname = "Act5") # works
-medlo_contour_Act5 <- f_data_interp_contour_no5000(gpname = "medlo", altname = "Act5") # works now, no contour lines - this may be happening because there is no variation in the data works with no20005000 and no50005500, created no5000 and worked. something wrong with the 5000 results here
-medmed_contour_Act5 <- f_data_interp_contour_no50005500(gpname = "medmed", altname = "Act5") # this one does not work at all - no contour lines - this may be happening because there is no variation in the data
-medhi_contour_Act5 <- f_data_interp_contour(gpname = "medhi", altname = "Alt5") # works
-hilo_contour_Act5 <- f_data_interp_contour_no20005000(gpname = "hilo", altname = "Act5") # works now, no contour lines - this may be happening because there is no variation in the data
-himed_contour_Act5 <- f_data_interp_contour_no50005500(gpname = "himed", altname = "Act5") # works now, no contour lines - this may be happening because there is no variation in the data
-hihi_contour_Act5 <- f_data_interp_contour_no50005500(gpname = "hihi", altname = "Act5") # this one does not work at all - no contour lines - this may be happening because there is no variation in the data
+# Act5
 
-# random data (these all worked fine so it seems like it is the weird 1:1 data)
 lolo_contour_Act5 <- f_data_interp_contour(gpname = "lolo", altname = "Act5")
-lomed_contour_Act5 <- f_data_interp_contour(gpname = "lomed", altname = "Act5")
-lohi_contour_Act5 <- f_data_interp_contour(gpname = "lohi", altname = "Act5")
+lomed_contour_Act5 <- f_data_interp_contour_no5500(gpname = "lomed", altname = "Act5")
+lohi_contour_Act5 <- f_data_interp_contour_no5500(gpname = "lohi", altname = "Act5")
 medlo_contour_Act5 <- f_data_interp_contour(gpname = "medlo", altname = "Act5")
 medmed_contour_Act5 <- f_data_interp_contour(gpname = "medmed", altname = "Act5")
 medhi_contour_Act5 <- f_data_interp_contour(gpname = "medhi", altname = "Act5")
-hilo_contour_Act5 <- f_data_interp_contour(gpname = "hilo", altname = "Act5")
+hilo_contour_Act5 <- f_data_interp_contour_no2000(gpname = "hilo", altname = "Act5")
 himed_contour_Act5 <- f_data_interp_contour(gpname = "himed", altname = "Act5")
 hihi_contour_Act5 <- f_data_interp_contour(gpname = "hihi", altname = "Act5")
+
 ## Combine contours --------------------------
 
 # 0.75 represents contour at which 75% overlap exists
@@ -269,3 +211,14 @@ contourGroup <- rbind(contours_all_NAA, contours_all_Act5)%>%
 plot_contours(alt = "NAA", cont = 0.75)
 plot_contours(alt = "Act5", cont = 0.75)
 
+
+# Make output table of prop overlap by OMR for Turner Cut, SJR Jer --------
+
+# Turner Cut, SJR at Jersey Point, Old R at Middle River
+# Realized that these are by inflow group which is different than the table
+nodesofinterest <- c(26, 469, 52)
+nodenames <- read.csv("data_raw/inputFile_withnode.csv") %>%
+  filter(node.no %in% nodesofinterest)
+
+prop_overlap_nodesofinterest <- zoi_data |>
+  filter(node %in% nodesofinterest)
